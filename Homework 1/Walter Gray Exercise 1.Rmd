@@ -2,10 +2,10 @@
 title: "wjg397_exercise1"
 author: "Walter Gray"
 date: "2/7/2021"
-output: html_document
+output: md_document
 ---
-## Data visualization: gas prices
 
+## Data visualization: gas prices
 ### A) Box Plot  
 ```{r, echo=FALSE, message=FALSE}
 library(tidyverse)
@@ -122,7 +122,8 @@ This graph attempts to answer the question of delay seasonality. Months of the y
 Delays were fairly consistent throughout the year, although there is a significant uptick in delays in December. Presumably holiday travel across both Southwest and other airlines is responsible for these delays. The time of year with the least delays is September, possibly because it is after summer vacation and lacks many holidays. The time of year with the highest likelihood to arrive _ahead_ of schedule is July. 
 
 ## 4) K-nearest neighbors
-```{r, echo=FALSE}
+### Investigating the 350 Trim
+```{r, echo=FALSE, message=FALSE}
 library(rsample)  
 library(caret)
 library(modelr)
@@ -131,6 +132,10 @@ library(mosaic)
 library(readxl)
 library(tidyverse)
 library(ggplot2)
+#load(file = "Walter_Gray_Ex_1_Global_Env.RData")
+sclass = read.csv('C:/Users/JamesGray/Desktop/ECO-395-Homework/Homework 1/sclass.csv')
+#Note to self: loading file only works when file path uses "/" not "\"
+#summary(sclass)
 #Filter by trim
 classA <- sclass %>% 
   filter(trim == "350")
@@ -150,6 +155,9 @@ p_test = ggplot(data = classA_test) +
 p_test
 p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
 ```
+
+Testing with K=2. rmse is 13895.05 at k=2
+
 ```{r,echo=FALSE}
 library(rsample)  
 library(caret)
@@ -178,7 +186,204 @@ p_test = ggplot(data = classA_test) +
 p_test
 p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
 ```
-```{r}
+
+Testing with K=10. rmse is 12793.45 at k=10
+
+```{r,echo=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#Filter by trim
+classA <- sclass %>% 
+  filter(trim == "350")
+# Make a train-test split
+classA_split =  initial_split(classA, prop=0.9)
+classA_train = training(classA_split)
+classA_test  = testing(classA_split)
+# KNN with K = 20
+knn20 = knnreg(mileage ~ price, data=classA_train, k=20)
+#rmse(knn20, classA_test)
+#rmse is 18803.6 at k=20
+
+#plot(price ~ mileage, data = classA_train)
+
+p_test = ggplot(data = classA_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
 
 ```
 
+Testing with K=. rmse is 18803.6 at k=20
+
+```{r, echo=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#Filter by trim
+classA <- sclass %>% 
+  filter(trim == "350")
+# Make a train-test split
+classA_split =  initial_split(classA, prop=0.9)
+classA_train = training(classA_split)
+classA_test  = testing(classA_split)
+# KNN with K = 50
+knn50 = knnreg(mileage ~ price, data=classA_train, k=50)
+#rmse(knn50, classA_test)
+#rmse is 19491.72 at k=50
+
+#plot(price ~ mileage, data = classA_train)
+
+p_test = ggplot(data = classA_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
+
+```
+
+Testing with K=50. rmse is 19491.72 at k=50
+
+### Investigating the 65 AMG Trim
+
+```{r, echo=FALSE, message=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#load(file = "Walter_Gray_Ex_1_Global_Env.RData")
+sclass = read.csv('C:/Users/JamesGray/Desktop/ECO-395-Homework/Homework 1/sclass.csv')
+#Note to self: loading file only works when file path uses "/" not "\"
+#Filter by trim
+amgclass <- sclass %>% 
+  filter(trim == "65 AMG")
+# Make a train-test split
+amgclass_split =  initial_split(amgclass, prop=0.9)
+amgclass_train = training(amgclass_split)
+amgclass_test  = testing(amgclass_split)
+# KNN with K = 2
+knn2 = knnreg(mileage ~ price, data=amgclass_train, k=2)
+#rmse(knn2, amgclass_test)
+#rmse is 24235.91 at k=2
+
+p_test = ggplot(data = amgclass_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
+```
+
+Testing with K=2. rmse is 24235.91 at k=2
+
+```{r, echo=FALSE, message=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#load(file = "Walter_Gray_Ex_1_Global_Env.RData")
+sclass = read.csv('C:/Users/JamesGray/Desktop/ECO-395-Homework/Homework 1/sclass.csv')
+#Note to self: loading file only works when file path uses "/" not "\"
+#Filter by trim
+amgclass <- sclass %>% 
+  filter(trim == "65 AMG")
+# Make a train-test split
+amgclass_split =  initial_split(amgclass, prop=0.9)
+amgclass_train = training(amgclass_split)
+amgclass_test  = testing(amgclass_split)
+# KNN with K = 10
+knn10 = knnreg(mileage ~ price, data=amgclass_train, k=10)
+#rmse(knn10, amgclass_test)
+#rmse is 22966.98 at k=10
+
+p_test = ggplot(data = amgclass_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
+
+```
+
+Testing with K=10. rmse is 22966.98 at k=10
+
+```{r, echo=FALSE, message=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#load(file = "Walter_Gray_Ex_1_Global_Env.RData")
+sclass = read.csv('C:/Users/JamesGray/Desktop/ECO-395-Homework/Homework 1/sclass.csv')
+#Note to self: loading file only works when file path uses "/" not "\"
+#Filter by trim
+amgclass <- sclass %>% 
+  filter(trim == "65 AMG")
+# Make a train-test split
+amgclass_split =  initial_split(amgclass, prop=0.9)
+amgclass_train = training(amgclass_split)
+amgclass_test  = testing(amgclass_split)
+# KNN with K = 20
+knn20 = knnreg(mileage ~ price, data=amgclass_train, k=20)
+#rmse(knn20, amgclass_test)
+#rmse is 26695.81 at k=20
+
+p_test = ggplot(data = amgclass_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
+
+```
+
+Testing with K=20. rmse is 26695.81 at k=20
+
+```{r, echo=FALSE, message=FALSE}
+library(rsample)  
+library(caret)
+library(modelr)
+library(parallel)
+library(mosaic)
+library(readxl)
+library(tidyverse)
+library(ggplot2)
+#load(file = "Walter_Gray_Ex_1_Global_Env.RData")
+sclass = read.csv('C:/Users/JamesGray/Desktop/ECO-395-Homework/Homework 1/sclass.csv')
+#Note to self: loading file only works when file path uses "/" not "\"
+#Filter by trim
+amgclass <- sclass %>% 
+  filter(trim == "65 AMG")
+# Make a train-test split
+amgclass_split =  initial_split(amgclass, prop=0.9)
+amgclass_train = training(amgclass_split)
+amgclass_test  = testing(amgclass_split)
+# KNN with K = 50
+knn50 = knnreg(mileage ~ price, data=amgclass_train, k=50)
+rmse(knn50, amgclass_test)
+#rmse is 23020.88 at k=50
+
+p_test = ggplot(data = amgclass_test) + 
+  geom_point(mapping = aes(x = mileage, y = price), alpha=0.2)
+p_test
+p_test + geom_line(aes(x = mileage, y = price), color='red', size=1.5)
+
+
+```
+
+
+Testing with K=500. rmse is 23020.88 at k=50
