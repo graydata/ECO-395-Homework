@@ -1,0 +1,162 @@
+---
+title: "Walter Gray Exercise 2"
+author: "Walter Gray"
+date: "3/14/2021"
+output: md_document
+---
+## Visualizing Bus Ridership
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+data = capmetro_UT
+#Dataframe for Line Graph
+
+  d1 = capmetro_UT %>%
+  mutate(capmetro_UT,
+         day_of_week = factor(day_of_week,
+                              levels=c("Mon", "Tue", "Wed","Thu", "Fri", "Sat", "Sun")),
+         month = factor(month,
+                        levels=c("Sep", "Oct","Nov"))) %>%
+  group_by(hour_of_day,month,day_of_week) %>%
+  summarize(mean_boardings = mean(boarding)) 
+
+#Faceted line graphs
+ggplot(data = d1) +
+  geom_line(aes(x=hour_of_day, y=mean_boardings, color=month)) +
+  facet_wrap(~ day_of_week) +
+  #scale_x_continuous(breaks=6:21) +
+  labs(y= "Average Boardings", x = "Hour of Day") +
+  labs(title = "Boardings Throughout the Week") 
+```  
+The charts above show that there are substantial differences between weekday and weekend trips. During the week, ridership peaks in early evening hours. Average boardings show substantial variability from month to month. In particular, there are relatively fewer Monday boardings in September- perhaps a reflection of students skipping class earlier in the semester. In November a decrease in Wed/Thu/Fri bookings may be partially attributed to students returning home during the Thanksgiving holidays.
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+
+data = capmetro_UT
+e1 = capmetro_UT %>%
+  group_by()
+
+#Faceted scatter plots
+ggplot(data = capmetro_UT, mapping = aes(x = temperature, y = boarding, color=weekend)) + 
+  geom_point() +
+  facet_wrap(~ hour_of_day) +
+  labs(y= "Temperature", x = "Total Boardings") +
+  labs(title = "Effect of Temperature on Ridership")
+```
+The impact of temperature against ridership is relatively small during the early hours of the day on both weekdays and the weekend, but during weekday afternoons (from the period from 12PM through 3PM) there appears to be an increase in ridership at higher temperatures. One possible explanation for this is that students going to class during the week are somewhat more temperature sensitive during the hottest period of the day, so those that might have walked or biked might take the bus instead.
+
+## Problem 3: Classification and retrospective sampling
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+
+data = german_credit
+
+ggplot(data = german_credit, mapping = aes(x = history, y = Default)) +
+  geom_bar(stat='identity')
+```
+
+Because there were relatively few loans to people with "terrible" history that resulted in defaults, the sample disproportionately pulled from people with "poor" credit scores. This makes it seem overly likely that people with poor credit scores are going to be more likely to default. 
+
+```{r, echo=FALSE, message=FALSE}
+german_credit_split = initial_split(german_credit, prop = 0.8)
+german_credit_train = training(german_credit_split)
+german_credit_test = testing(german_credit_split)
+
+table(german_credit_train$Default)
+#557 didn't default, 244 did. So 29% of training set defaulted 
+
+glm(Default ~ duration + amount + installment + age + history + purpose + foreign, data=german_credit_train, family=binomial)
+```
+
+Interpreting the coefficients in the model, having a "terrible" history multiplies odds of default by .17 and having "poor" history multiplies odds of default by .000099. 
+
+Neither of these show a strong relationship to default, which is somewhat surprising. Two possibilities come to mind: one may be that credit history simply doesn't act as a good predictor of default. That's somewhat surprising, so before making that assumption I would first encourage the bank to widen their sampling pool to an audience that is more representative of their overall customer base. 
+
+## Problem 4: Children and hotel reservations
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(rsample)
+library(lubridate)
+library(mosaic)
+
+data = hotels_dev
+
+hotels_dev <- hotels_dev %>% 
+  mutate(arrival_date = ymd(arrival_date))
+
+hotels_dev = mutate(hotels_dev, 
+                       month = month(arrival_date) %>% factor(),     # month of day
+                       wday = wday(arrival_date) %>% factor())     # day of week (1 = Monday)
+
+hotels_split = initial_split(hotels_dev, prop = 0.8)
+hotels_train = training(hotels_split)
+hotels_test = testing(hotels_split)
+
+# Fit to the training data
+lm1 = lm(children ~ market_segment + adults + customer_type + is_repeated_guest, data=hotels_train)
+lm2 = lm(children ~ . - arrival_date, data=hotels_train)
+lm3 = lm(children ~ . - arrival_date + month + wday + is_repeated_guest*reserved_room_type, data=hotels_train)
+
+rmse(lm1, hotels_test)
+rmse(lm2, hotels_test)
+rmse(lm3, hotels_test)
+ 
+#Using K-fold cross validation
+hotels_folds = crossv_kfold(hotels_dev, k=10)
+
+foldlm1 = map(hotels_folds$train, ~ lm(children ~ market_segment + adults + customer_type + is_repeated_guest, data=hotels_train))
+foldlm2 = map(hotels_folds$train, ~ lm(children ~ . - arrival_date, data=hotels_train))
+foldlm3 = map(hotels_folds$train, ~ lm(children ~ . - arrival_date + month + wday + is_repeated_guest*reserved_room_type, data=hotels_train))
+                
+# map the RMSE calculation over the trained models and test sets simultaneously
+map2_dbl(foldlm1, hotels_folds$test, modelr::rmse) %>% mean
+map2_dbl(foldlm2, hotels_folds$test, modelr::rmse) %>% mean
+map2_dbl(foldlm3, hotels_folds$test, modelr::rmse) %>% mean
+```
+
+## Model Validation Step 1 
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(rsample)
+library(lubridate)
+library(mosaic)
+
+data = hotels_val
+
+hotels_val <- hotels_val %>% 
+  mutate(arrival_date = ymd(arrival_date))
+
+hotels_val = mutate(hotels_val, 
+                    month = month(arrival_date) %>% factor(),     # month of day
+                    wday = wday(arrival_date) %>% factor())     # day of week (1 = Monday)
+
+val_split = initial_split(hotels_val, prop = 0.8)
+val_train = training(val_split)
+val_test = testing(val_split)
+
+lm3 = lm(children ~ . - arrival_date + month + wday + is_repeated_guest*reserved_room_type, data=val_train)
+
+phat_train_val = predict(lm3, val_train)
+yhat_train_val = ifelse(phat_train_val > 0.5, 1, 0)
+confusion_in = table(y = val_train$children, yhat = yhat_train_val)
+confusion_in
+
+#TPR is 128/334, roughly 38%
+#FPR is 50/3666, roughly 1.3%
+
+#Skipped the step to establish the ROC curve, wasn't sure how to visually represent that
+
+#Establish baseline
+table(hotels_val$children)
+#402/4999 have children (12.4%)
+
+```
+
