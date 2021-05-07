@@ -1,0 +1,71 @@
+---
+title: "wjg397_exercise1"
+author: "Walter Gray"
+date: "2/7/2021"
+output: md_document
+---
+
+## Wine Analysis with Clustering and PCA
+
+The dataset "wine.csv" contains chemical information from 6500 bottles of wine along with a subjective quality rating and an indication of whether the wine is red and white. This analysis attempts to uncover patterns within the data that reveal the color of the wine and the quality by solely looking at the chemical composition. 
+
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(plyr)
+library(LICORS)
+
+wine = read.csv("C:/Users/JamesGray/Desktop/ECO395M/data/wine.csv")
+
+wine_unsupervised = wine %>%
+  select(-color) %>%
+  select(-quality)
+
+ggcorrplot::ggcorrplot(cor(wine_unsupervised), hc.order = TRUE)
+```  
+An initial look at the correlation matrix with hierarchical clustering for the chemical properties shows some clustering around certain chemical properties.
+
+Running PCA against the data (with K=4) gives us four components that account for 73.18% of the information contained in the original eleven features. 
+
+```{r, echo = FALSE}
+PCAwine = prcomp(wine_unsupervised, scale=TRUE, rank=4)
+
+summary(PCAwine)
+```  
+
+```{r, echo=FALSE}
+round(PCAwine$rotation[,1:4],2) 
+```
+The loadings for each variable give an indication for what each PCA is capturing: 
+Pc1 might suggest wines with more sulfur dioxide are less likely to be acidic 
+Pc2 might suggest that denser wines are also less alcoholic 
+PC3 seems to be about acidity 
+PC4 seems to be about sulfates
+
+### Approaching the wine data with K Means
+The next analysis will approach the dataset with K means. I chose K=2 given that there are two types of wines being evaluated. 
+
+Claim: Shell charges more than other brands  
+Conclusion: It appears that Shell charges more than the other major brands listed in the dataset, but not more than brands that fall into the "other" category (which might be independent or smaller brands.)
+
+```{r, echo=FALSE}
+Kwine = scale(wine_unsupervised, center = TRUE, scale=TRUE)
+
+mu = attr(Kwine,"scaled:center")
+sigma = attr(Kwine,"scaled:scale")
+
+clust1 = kmeans(Kwine, 2, nstart=25)
+
+qplot(residual.sugar, sulphates, data=wine, color=(factor(clust1$cluster)))
+```
+
+Two clusters start to emerge when looking at the chemical properties residual.sugar and sulphates; one cluster is low in sugar but much higher in sulfates. Higher sulfates might indicate something about the wine's quality.
+
+```{r, echo=FALSE}
+qplot(citric.acid, chlorides, data=wine, color=(factor(clust1$cluster)))
+```
+
+Applying K means against citric and chlorides paints a murkier picture given how close the two clusters are here. 
+
+## 2) Market Segmentation
+
+
