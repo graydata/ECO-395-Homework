@@ -1,7 +1,7 @@
 ---
-title: "wjg397_exercise1"
+title: "wjg397_exercise4"
 author: "Walter Gray"
-date: "2/7/2021"
+date: "5/6/2021"
 output: md_document
 ---
 
@@ -68,4 +68,40 @@ Applying K means against citric and chlorides paints a murkier picture given how
 
 ## 2) Market Segmentation
 
+Nutrient H20 has a robust and diverse following on Twitter, and this report attempts to shed light on the broad buckets of personas that make up the Nutrient H20 fanbase. We ran a PCA analysis against tweets categorized by 36 predefined interest categories, and picked 10 components that captured 60.77% of the information from the full data. 
 
+```{r, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(plyr)
+library(LICORS)
+
+marketing = read.csv("C:/Users/JamesGray/Desktop/ECO395M/data/social_marketing.csv")
+head(marketing)
+
+marketing_simple = marketing %>%
+  select(-X)
+  
+marketing_pca = prcomp(marketing_simple, scale=TRUE, rank=10)
+loadings = marketing_pca$rotation
+scores = marketing_pca$x
+
+summary(marketing_pca)
+
+```  
+
+Next we investigated these ten cohorts for shared interests (or distinct lack of interest in certain topics). Although the first and third cohort (PC1 and PC4) resisted any clearly identifiable label, the rest were revealing. 
+
+
+```{r, echo=FALSE, message=FALSE}
+round(marketing_pca$rotation[,1:10],2) 
+```  
+## Recommendations
+
+PC2 consists of people interested in cooking, beauty, shopping, and fashion (that like to take and share pictures). These may be influencers or simply modern day epicurians. Messaging for this group should speak to the elevated sensory experience that NutrientH20 uniquely provides.
+PC3 consists of fitness enthusiasts, so the message might highlight the many nutrients in the beverage.
+PC5 may capture college age students interested in online gaming and sports; hydration is necessary for peak performance in both traditional sports and e-sports, so that message may be appealing (although likely to come up against other soft drinks and energy drinks catering to the same group)
+PC6 picks up a lot of chatter and shopping content, which may indicate this is a group of bots promoting affiliate links or simply a group that is difficult to categorize 
+PC7 consists of artists and creators. Messaging here may appeal to the value of engaging with all of one's senses while in a creative state. 
+PC8 isn't entirely clear but seems to capture people who enjoy traveling and computers. You may emphasize NutrientH20's latest TCA-compliant travel-size bottles with this savvy crowd.  
+PC9 = consists of film enthusiasts, so consider investing in product placement to reinforce the value to this group.
+PC10 = captures students that are interested in dating and maintaining a pleasant home. Consider an ad campaign that feature couples in a domestic setting. 
