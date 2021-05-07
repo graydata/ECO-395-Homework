@@ -9,9 +9,11 @@ quality by solely looking at the chemical composition.
     ## Warning: package 'LICORS' was built under R version 4.0.5
 
 ![](Walter-Gray-Exercise-4_files/figure-markdown_strict/unnamed-chunk-1-1.png)
-An initial look at the correlation matrix with hierarchical clustering
-for the chemical properties shows some clustering around certain
-chemical properties.
+
+The figure above shows the correlation matrix with hierarchical
+clustering for the chemical properties. Some clusters are evident around
+certain chemical properties (positive correlations between residual
+sugar and sulfur dioxide, for example).
 
 Running PCA against the data (with K=4) gives us four components that
 account for 73.18% of the information contained in the original eleven
@@ -37,19 +39,21 @@ features.
     ## alcohol              -0.11 -0.47 -0.26 -0.11
 
 The loadings for each variable give an indication for what each PCA is
-capturing: Pc1 might suggest wines with more sulfur dioxide are less
-likely to be acidic Pc2 might suggest that denser wines are also less
-alcoholic PC3 seems to be about acidity PC4 seems to be about sulfates
+capturing:
+
+PC1 might suggest wines with more sulfur dioxide are less likely to be
+acidic
+
+PC2 might suggest that denser wines are also less alcoholic
+
+PC3 seems to be about acidity
+
+PC4 seems to be about sulfates
 
 ### Approaching the wine data with K Means
 
 The next analysis will approach the dataset with K means. I chose K=2
 given that there are two types of wines being evaluated.
-
-Claim: Shell charges more than other brands  
-Conclusion: It appears that Shell charges more than the other major
-brands listed in the dataset, but not more than brands that fall into
-the “other” category (which might be independent or smaller brands.)
 
 ![](Walter-Gray-Exercise-4_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
@@ -166,20 +170,30 @@ PC2 consists of people interested in cooking, beauty, shopping, and
 fashion (that like to take and share pictures). These may be influencers
 or simply modern day epicurians. Messaging for this group should speak
 to the elevated sensory experience that NutrientH20 uniquely provides.
+
 PC3 consists of fitness enthusiasts, so the message might highlight the
-many nutrients in the beverage. PC5 may capture college age students
-interested in online gaming and sports; hydration is necessary for peak
-performance in both traditional sports and e-sports, so that message may
-be appealing (although likely to come up against other soft drinks and
-energy drinks catering to the same group) PC6 picks up a lot of chatter
-and shopping content, which may indicate this is a group of bots
-promoting affiliate links or simply a group that is difficult to
-categorize PC7 consists of artists and creators. Messaging here may
-appeal to the value of engaging with all of one’s senses while in a
-creative state. PC8 isn’t entirely clear but seems to capture people who
-enjoy traveling and computers. You may emphasize NutrientH20’s latest
-TCA-compliant travel-size bottles with this savvy crowd.  
+many nutrients in the beverage.
+
+PC5 may capture college age students interested in online gaming and
+sports; hydration is necessary for peak performance in both traditional
+sports and e-sports, so that message may be appealing (although likely
+to come up against other soft drinks and energy drinks catering to the
+same group)
+
+PC6 picks up a lot of chatter and shopping content, which may indicate
+this is a group of bots promoting affiliate links or simply a group that
+is difficult to categorize
+
+PC7 consists of artists and creators. Messaging here may appeal to the
+value of engaging with all of one’s senses while in a creative state.
+
+PC8 isn’t entirely clear but seems to capture people who enjoy traveling
+and computers. You may emphasize NutrientH20’s latest TCA-compliant
+travel-size bottles with this savvy crowd.
+
 PC9 = consists of film enthusiasts, so consider investing in product
-placement to reinforce the value to this group. PC10 = captures students
-that are interested in dating and maintaining a pleasant home. Consider
-an ad campaign that feature couples in a domestic setting.
+placement to reinforce the value to this group.
+
+PC10 = captures students that are interested in dating and maintaining a
+pleasant home. Consider an ad campaign that feature couples in a
+domestic setting.
